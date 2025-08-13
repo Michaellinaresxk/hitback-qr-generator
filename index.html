@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 HITBACK - QR Generator Escalable</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="success-header">
+            <h1>🎉 ¡HITBACK QR GENERATOR!</h1>
+            <p style="font-size: 1.3rem; margin-top: 15px; opacity: 0.9;">
+                🎯 Escalable ✅ | QRs Consistentes ✅ | Auto-Sync ✅
+            </p>
+            
+            <!-- 🎛️ PANEL DE CONTROL -->
+            <div class="control-panel">
+                <h3>🎛️ Control Panel</h3>
+                
+                <div class="mode-controls">
+                    <button onclick="setMode('static')" class="btn mode-btn" id="staticBtn">
+                        📱 Modo Estático
+                    </button>
+                    <button onclick="setMode('hybrid')" class="btn mode-btn active" id="hybridBtn">
+                        🔄 Modo Híbrido (Recomendado)
+                    </button>
+                    <button onclick="setMode('dynamic')" class="btn mode-btn" id="dynamicBtn">
+                        🌐 Modo Dinámico
+                    </button>
+                </div>
+                
+                <div class="sync-controls">
+                    <button onclick="syncFromBackend()" class="btn btn-sync">
+                        🔄 Sincronizar Nuevas Canciones
+                    </button>
+                    <button onclick="generateAllQRs()" class="btn btn-generate">
+                        🎯 Generar Todos los QRs
+                    </button>
+                    <button onclick="downloadAllQRs()" class="btn btn-download">
+                        📦 Descargar Pack Completo
+                    </button>
+                </div>
+                
+                <div class="environment-selector">
+                    <label>🌍 Ambiente de Producción:</label>
+                    <select id="environmentSelect" onchange="changeEnvironment()">
+                        <option value="local">🏠 Local (localhost:3000)</option>
+                        <option value="dev" selected>🔧 Development (192.168.1.10:3000)</option>
+                        <option value="prod">🚀 Production (tu-dominio.com)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 📊 ESTADO ACTUAL -->
+        <div class="status-success" id="statusBar">
+            ⚡ Iniciando QR Generator...
+        </div>
+        
+        <!-- 🎊 CELEBRACIÓN -->
+        <div class="celebration">
+            🎵🎉🚀
+        </div>
+
+        <!-- 📱 GRID DE QRs -->
+        <div class="qr-grid" id="qrGrid">
+            <div class="loading-state">
+                <h3>🔄 Inicializando generador...</h3>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+        
+        <!-- 📈 ESTADÍSTICAS -->
+        <div class="stats-panel" id="statsPanel" style="display: none;">
+            <h3>📊 Estadísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalTracks">0</span>
+                    <span class="stat-label">Total Tracks</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="newTracks">0</span>
+                    <span class="stat-label">Nuevas Canciones</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="qrGenerated">0</span>
+                    <span class="stat-label">QRs Generados</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="lastSync">Nunca</span>
+                    <span class="stat-label">Última Sync</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚀 JavaScript Mejorado -->
+    <script src="app.js"></script>
+    
+    <!-- 📱 PWA Support (Opcional) -->
+    <script>
+        // Service Worker para funcionamiento offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {
+                console.log('PWA no disponible');
+            });
+        }
+    </script>
+</body>
+</html>
