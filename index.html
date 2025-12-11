@@ -3,76 +3,639 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎉 HITBACK - QR Generator Escalable</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>🎵 HITBACK - QR Formato Nuevo Escalable</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .format-notice {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Controls */
+        .controls {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .controls h2 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-download {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        /* Status Bar */
+        #statusBar {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            color: #475569;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        /* QR Grid */
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* QR Card */
+        .qr-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .track-header {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .track-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .track-artist {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .status-badges > div {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .success-badge {
+            background: #10b981;
+            color: white;
+        }
+
+        .mode-badge {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .audio-indicator {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .qr-image {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .qr-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .qr-code {
+            background: #f1f5f9;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            color: #475569;
+            word-break: break-all;
+            margin: 1rem 0;
+            line-height: 1.5;
+        }
+
+        .track-details {
+            margin: 1rem 0;
+        }
+
+        .track-details p {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .track-details strong {
+            color: #1e293b;
+        }
+
+        .format-badge {
+            background: #10b981;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            word-break: break-all;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .card-actions .btn {
+            flex: 1;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            color: #1e293b;
+        }
+
+        .error-state h3 {
+            color: #ef4444;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            color: #64748b;
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        /* Environment Selector */
+        .environment-selector {
+            margin-top: 1.5rem;
+        }
+
+        .environment-selector label {
+            display: block;
+            color: #475569;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .environment-selector select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Mode Controls */
+        .mode-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            opacity: 0.6;
+        }
+
+        .mode-btn.active {
+            opacity: 1;
+        }
+
+        /* Stats Panel */
+        #statsPanel {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        #statsPanel h3 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .new-tracks-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 1.5rem 0;
+        }
+
+        .new-track-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-track-item:last-child {
+            border-bottom: none;
+        }
+
+        .new-track-item strong {
+            color: #1e293b;
+        }
+
+        .track-id {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .header, .controls, #statusBar, #statsPanel {
+                display: none;
+            }
+
+            .qr-card {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 2px solid #e2e8f0;
+            }
+
+            .card-actions {
+                display: none;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .mode-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="success-header">
-            <h1>🎉 ¡HITBACK QR GENERATOR!</h1>
-            <p style="font-size: 1.3rem; margin-top: 15px; opacity: 0.9;">
-                🎯 Escalable ✅ | QRs Consistentes ✅ | Auto-Sync ✅
-            </p>
+        <!-- Header -->
+        <div class="header">
+            <h1>🎵 HITBACK - QR Formato Nuevo Escalable</h1>
+            <p>✅ Sistema actualizado: Solo formato nuevo escalable</p>
+            <div class="format-notice">
+                ✨ FORMATO ÚNICO: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+            </div>
             
-            <!-- 🎛️ PANEL DE CONTROL -->
-            <div class="control-panel">
-                <h3>🎛️ Control Panel</h3>
-                
-                <div class="mode-controls">
-                    <button onclick="setMode('static')" class="btn mode-btn" id="staticBtn">
-                        📱 Modo Estático
-                    </button>
-                    <button onclick="setMode('hybrid')" class="btn mode-btn active" id="hybridBtn">
-                        🔄 Modo Híbrido (Recomendado)
-                    </button>
-                    <button onclick="setMode('dynamic')" class="btn mode-btn" id="dynamicBtn">
-                        🌐 Modo Dinámico
-                    </button>
+            <div class="stats-bar">
+                <div class="stat-box">
+                    <span class="stat-number">60</span>
+                    <span class="stat-label">Cartas Físicas</span>
                 </div>
-                
-                <div class="sync-controls">
-                    <button onclick="syncFromBackend()" class="btn btn-sync">
-                        🔄 Sincronizar Nuevas Canciones
-                    </button>
-                    <button onclick="generateAllQRs()" class="btn btn-generate">
-                        🎯 Generar Todos los QRs
-                    </button>
-                    <button onclick="downloadAllQRs()" class="btn btn-download">
-                        📦 Descargar Pack Completo
-                    </button>
+                <div class="stat-box">
+                    <span class="stat-number">300</span>
+                    <span class="stat-label">Canciones Backend</span>
                 </div>
-                
-                <div class="environment-selector">
-                    <label>🌍 Ambiente de Producción:</label>
-                    <select id="environmentSelect" onchange="changeEnvironment()">
-                        <option value="local">🏠 Local (localhost:3000)</option>
-                        <option value="dev" selected>🔧 Development (192.168.1.10:3000)</option>
-                        <option value="prod">🚀 Production (tu-dominio.com)</option>
-                    </select>
+                <div class="stat-box">
+                    <span class="stat-number">18,000</span>
+                    <span class="stat-label">Combinaciones</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">🎲</span>
+                    <span class="stat-label">Aleatorio Inteligente</span>
                 </div>
             </div>
-        </div>
-        
-        <!-- 📊 ESTADO ACTUAL -->
-        <div class="status-success" id="statusBar">
-            ⚡ Iniciando QR Generator...
-        </div>
-        
-        <!-- 🎊 CELEBRACIÓN -->
-        <div class="celebration">
-            🎵🎉🚀
         </div>
 
-        <!-- 📱 GRID DE QRs -->
-        <div class="qr-grid" id="qrGrid">
-            <div class="loading-state">
-                <h3>🔄 Inicializando generador...</h3>
-                <div class="loading-spinner"></div>
+        <!-- Controls -->
+        <div class="controls">
+            <h2>🎛️ Controles</h2>
+            
+            <div class="mode-controls">
+                <button onclick="setMode('static')" class="btn mode-btn" id="staticBtn">
+                    📱 Modo Estático
+                </button>
+                <button onclick="setMode('hybrid')" class="btn mode-btn active" id="hybridBtn">
+                    🔄 Modo Híbrido
+                </button>
+                <button onclick="setMode('dynamic')" class="btn mode-btn" id="dynamicBtn">
+                    🌐 Modo Dinámico
+                </button>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateAllQRs()">
+                    🎯 Regenerar QRs
+                </button>
+                <button class="btn btn-success" onclick="syncFromBackend()">
+                    🔄 Sincronizar Backend
+                </button>
+                <button class="btn btn-download" onclick="downloadAllQRs()">
+                    📦 Descargar Todas (60)
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()">
+                    🖨️ Imprimir
+                </button>
+            </div>
+
+            <div class="environment-selector">
+                <label>🌍 Ambiente de Backend:</label>
+                <select id="environmentSelect" onchange="changeEnvironment()">
+                    <option value="local">🏠 Local (localhost:3000)</option>
+                    <option value="dev" selected>🔧 Development (192.168.1.10:3000)</option>
+                    <option value="prod">🚀 Production (api.hitback.com)</option>
+                </select>
             </div>
         </div>
-        
-        <!-- 📈 ESTADÍSTICAS -->
-        <div class="stats-panel" id="statsPanel" style="display: none;">
+
+        <!-- Status Bar -->
+        <div id="statusBar">
+            ⚡ Iniciando generador QR con formato nuevo escalable...
+        </div>
+
+        <!-- Stats Panel -->
+        <div id="statsPanel" style="display: none;">
             <h3>📊 Estadísticas</h3>
             <div class="stats-grid">
                 <div class="stat-item">
@@ -93,19 +656,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- QR Grid -->
+        <div class="qr-grid" id="qrGrid">
+            <div class="loading-state">
+                <h3>🔄 Generando 60 QR codes (formato nuevo)...</h3>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- 🚀 JavaScript Mejorado -->
+    <!-- JavaScript -->
     <script src="app.js"></script>
-    
-    <!-- 📱 PWA Support (Opcional) -->
-    <script>
-        // Service Worker para funcionamiento offline
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {
-                console.log('PWA no disponible');
-            });
-        }
-    </script>
 </body>
 </html>

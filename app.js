@@ -1,7 +1,8 @@
-// 🎵 HITBACK QR Generator - VERSIÓN ESCALABLE Y CLEAN CODE
-// 🏗️ Arquitectura: Híbrido (Estático + Dinámico) con Clean Code principles
+// 🎵 HITBACK QR Generator - SOLO FORMATO NUEVO ESCALABLE
+// ✅ Formato único: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+// 🎯 60 cartas físicas → 300 canciones backend → Selección aleatoria inteligente
 
-// 🌍 CONFIGURACIÓN DE AMBIENTES - Escalable para producción
+// 🌍 CONFIGURACIÓN DE AMBIENTES
 const ENVIRONMENTS = {
   local: {
     name: 'LOCAL',
@@ -10,26 +11,26 @@ const ENVIRONMENTS = {
   },
   dev: {
     name: 'DEVELOPMENT',
-    url: 'http://192.168.1.10:3000',
+    url: 'http://192.168.1.10:3000', // ← CAMBIA TU IP AQUÍ
     icon: '🔧'
   },
   prod: {
     name: 'PRODUCTION',
-    url: 'https://api.hitback.com', // 🔄 Cambiar por tu dominio real
+    url: 'https://api.hitback.com',
     icon: '🚀'
   }
 };
 
-// 📊 ESTADO GLOBAL DE LA APLICACIÓN
+// 📊 ESTADO GLOBAL
 const AppState = {
-  currentMode: 'hybrid', // 'static', 'hybrid', 'dynamic'
+  currentMode: 'hybrid',
   currentEnvironment: 'dev',
   tracks: [],
+  cards: [],
   isLoading: false,
   lastSync: null,
   newTracksFound: 0,
 
-  // 📱 Getters
   get currentBackendUrl() {
     return ENVIRONMENTS[this.currentEnvironment].url;
   },
@@ -43,125 +44,88 @@ const AppState = {
   }
 };
 
-// 📋 TRACKS ESTÁTICOS - Base de datos local escalable
-// ✅ Estos SIEMPRE funcionarán, sin importar el estado del backend
-const STATIC_TRACKS = [
-  {
-    id: "001",
-    title: "Despacito",
-    artist: "Luis Fonsi ft. Daddy Yankee",
-    album: "Vida",
-    year: 2017,
-    genre: "Reggaeton",
-    audioFile: "001_despacito.mp3"
-  },
-  {
-    id: "002",
-    title: "Bohemian Rhapsody",
-    artist: "Queen",
-    album: "A Night at the Opera",
-    year: 1975,
-    genre: "Rock",
-    audioFile: "002_bohemian_rhapsody.mp3"
-  },
-  {
-    id: "003",
-    title: "Rock the Night",
-    artist: "Europe",
-    album: "The Final Countdown",
-    year: 1986,
-    genre: "Hard Rock/Glam Metal",
-    audioFile: "003_rock_night.mp3"
-  },
-  {
-    id: "004",
-    title: "Uptown Funk",
-    artist: "Mark Ronson ft. Bruno Mars",
-    album: "Uptown Special",
-    year: 2014,
-    genre: "Funk/Pop",
-    audioFile: "004_uptown_funk.mp3"
-  },
-  {
-    id: "005",
-    title: "Enjoy the Silence",
-    artist: "Depeche Mode",
-    album: "Violator",
-    year: 1990,
-    genre: "Electronic/Synth-pop",
-    audioFile: "005_enjoy_the_silence.mp3"
-  },
-  {
-    id: "006",
-    title: "Sharp Dressed Man",
-    artist: "ZZ Top",
-    album: "Eliminator",
-    year: 1983,
-    genre: "Rock/Blues Rock",
-    audioFile: "006_sharp_dressed_man.mp3"
-  },
-  {
-    id: "007",
-    title: "Don't Stop Believin'",
-    artist: "Journey",
-    album: "Escape",
-    year: 1981,
-    genre: "Rock/Arena Rock",
-    audioFile: "007_dont_stop_believing.mp3"
-  },
-  {
-    id: "008",
-    title: "Money",
-    artist: "Pink Floyd",
-    album: "The Dark Side of the Moon",
-    year: 1973,
-    genre: "Progressive Rock",
-    audioFile: "008_money.mp3"
-  },
-  {
-    id: "009",
-    title: "Born to Be Wild",
-    artist: "Steppenwolf",
-    album: "Steppenwolf",
-    year: 1968,
-    genre: "Hard Rock",
-    audioFile: "009_born_to_be_wild.mp3"
-  },
-  {
-    id: "010",
-    title: "You Really Got Me",
-    artist: "The Kinks",
-    album: "The Kinks",
-    year: 1964,
-    genre: "Rock/Proto-punk",
-    audioFile: "006_you_really_got_me.mp3"
-  }
+// 📋 CONFIGURACIÓN DE 60 CARTAS FÍSICAS
+const DECK_CONFIG = [
+  // === SONG EASY (15 cartas) ===
+  { type: 'SONG', diff: 'EASY', genre: 'ANY', decade: 'ANY', count: 5 },
+  { type: 'SONG', diff: 'EASY', genre: 'ROCK', decade: 'ANY', count: 3 },
+  { type: 'SONG', diff: 'EASY', genre: 'POP', decade: 'ANY', count: 3 },
+  { type: 'SONG', diff: 'EASY', genre: 'ANY', decade: '1980s', count: 2 },
+  { type: 'SONG', diff: 'EASY', genre: 'ANY', decade: '2010s', count: 2 },
+
+  // === SONG MEDIUM (12 cartas) ===
+  { type: 'SONG', diff: 'MEDIUM', genre: 'ANY', decade: 'ANY', count: 4 },
+  { type: 'SONG', diff: 'MEDIUM', genre: 'ROCK', decade: 'ANY', count: 3 },
+  { type: 'SONG', diff: 'MEDIUM', genre: 'REGGAETON', decade: 'ANY', count: 3 },
+  { type: 'SONG', diff: 'MEDIUM', genre: 'ANY', decade: '1990s', count: 2 },
+
+  // === SONG HARD (8 cartas) ===
+  { type: 'SONG', diff: 'HARD', genre: 'ANY', decade: 'ANY', count: 3 },
+  { type: 'SONG', diff: 'HARD', genre: 'ROCK', decade: 'ANY', count: 2 },
+  { type: 'SONG', diff: 'HARD', genre: 'ELECTRONIC', decade: 'ANY', count: 2 },
+  { type: 'SONG', diff: 'HARD', genre: 'ANY', decade: '1970s', count: 1 },
+
+  // === ARTIST (10 cartas) ===
+  { type: 'ARTIST', diff: 'EASY', genre: 'ANY', decade: 'ANY', count: 3 },
+  { type: 'ARTIST', diff: 'MEDIUM', genre: 'ROCK', decade: 'ANY', count: 3 },
+  { type: 'ARTIST', diff: 'HARD', genre: 'ANY', decade: 'ANY', count: 2 },
+  { type: 'ARTIST', diff: 'HARD', genre: 'REGGAETON', decade: 'ANY', count: 2 },
+
+  // === DECADE (8 cartas) ===
+  { type: 'DECADE', diff: 'EASY', genre: 'ANY', decade: 'ANY', count: 2 },
+  { type: 'DECADE', diff: 'MEDIUM', genre: 'ANY', decade: 'ANY', count: 3 },
+  { type: 'DECADE', diff: 'HARD', genre: 'ANY', decade: 'ANY', count: 3 },
+
+  // === LYRICS (5 cartas) ===
+  { type: 'LYRICS', diff: 'MEDIUM', genre: 'ANY', decade: 'ANY', count: 2 },
+  { type: 'LYRICS', diff: 'HARD', genre: 'ANY', decade: 'ANY', count: 3 },
+
+  // === CHALLENGE (2 cartas) ===
+  { type: 'CHALLENGE', diff: 'MEDIUM', genre: 'ANY', decade: 'ANY', count: 2 }
 ];
 
-// 🏭 CLASE PRINCIPAL - Clean Architecture Pattern
+// 🎨 ICONOS Y COLORES
+const CARD_ICONS = {
+  SONG: '🎵',
+  ARTIST: '🎤',
+  DECADE: '📅',
+  LYRICS: '📝',
+  CHALLENGE: '🔥'
+};
+
+const CARD_COLORS = {
+  SONG: '#3b82f6',
+  ARTIST: '#ec4899',
+  DECADE: '#8b5cf6',
+  LYRICS: '#f59e0b',
+  CHALLENGE: '#ef4444'
+};
+
+// 🏭 CLASE PRINCIPAL
 class ScalableQRGenerator {
   constructor() {
     this.qrService = new QRCodeService();
     this.backendService = new BackendService();
-    this.trackManager = new TrackManager();
     this.uiManager = new UIManager();
 
-    console.log('🎵 HITBACK QR Generator - Versión Escalable iniciada');
+    console.log('🎵 HITBACK QR Generator - Formato Nuevo Escalable');
   }
 
-  // 🚀 INICIALIZAR APLICACIÓN
   async initialize() {
     try {
       console.log('🚀 Inicializando aplicación...');
 
-      // 1. Cargar tracks según el modo
+      // 1. Cargar tracks del backend
       await this.loadTracks();
 
-      // 2. Actualizar UI
+      // 2. Generar 60 cartas
+      AppState.cards = this.qrService.generateDeck();
+
+      // 3. Actualizar UI
       this.uiManager.updateStatus();
       this.uiManager.updateStats();
 
-      // 3. Generar QRs iniciales
+      // 4. Renderizar cartas
       await this.generateAllQRs();
 
       console.log('✅ Aplicación inicializada exitosamente');
@@ -172,15 +136,14 @@ class ScalableQRGenerator {
     }
   }
 
-  // 🔄 CARGAR TRACKS SEGÚN EL MODO
   async loadTracks() {
     AppState.isLoading = true;
-    this.uiManager.showLoading('Cargando tracks...');
+    this.uiManager.showLoading('Cargando tracks desde backend...');
 
     try {
       switch (AppState.currentMode) {
         case 'static':
-          AppState.tracks = [...STATIC_TRACKS];
+          AppState.tracks = this.getStaticTracks();
           console.log('📱 Modo estático: usando tracks locales');
           break;
 
@@ -191,89 +154,93 @@ class ScalableQRGenerator {
 
         case 'hybrid':
         default:
-          // Intentar backend, fallback a estático
           try {
             AppState.tracks = await this.backendService.fetchTracks();
-            console.log('🔄 Modo híbrido: tracks desde backend');
+            console.log(`🔄 Modo híbrido: ${AppState.tracks.length} tracks desde backend`);
           } catch (error) {
             console.warn('⚠️ Backend no disponible, usando tracks estáticos');
-            AppState.tracks = [...STATIC_TRACKS];
+            AppState.tracks = this.getStaticTracks();
           }
           break;
       }
 
+      console.log(`✅ ${AppState.tracks.length} tracks cargados`);
+
     } catch (error) {
-      console.warn('⚠️ Error cargando tracks, usando fallback estático');
-      AppState.tracks = [...STATIC_TRACKS];
+      console.warn('⚠️ Error cargando tracks, usando fallback');
+      AppState.tracks = this.getStaticTracks();
     } finally {
       AppState.isLoading = false;
     }
   }
 
-  // 🔄 SINCRONIZAR DESDE BACKEND - Función clave para escalabilidad
+  getStaticTracks() {
+    return [
+      {
+        id: "001",
+        title: "Don't Stop Believin'",
+        artist: "Journey",
+        genre: "ROCK",
+        decade: "1980s",
+        difficulty: "EASY"
+      },
+      {
+        id: "121",
+        title: "Despacito",
+        artist: "Luis Fonsi ft. Daddy Yankee",
+        genre: "REGGAETON",
+        decade: "2010s",
+        difficulty: "EASY"
+      }
+    ];
+  }
+
   async syncFromBackend() {
     try {
       AppState.isLoading = true;
-      this.uiManager.showLoading('🔄 Sincronizando nuevas canciones...');
+      this.uiManager.showLoading('🔄 Sincronizando con backend...');
 
-      console.log('🔄 Iniciando sincronización desde backend...');
+      console.log(`🔄 Conectando a: ${AppState.currentBackendUrl}/api/tracks`);
 
-      // 1. Obtener tracks actuales del backend
       const backendTracks = await this.backendService.fetchTracks();
-
-      // 2. Comparar con tracks existentes para encontrar nuevos
       const currentIds = AppState.tracks.map(t => t.id);
       const newTracks = backendTracks.filter(t => !currentIds.includes(t.id));
 
-      // 3. Actualizar estado
       AppState.tracks = backendTracks;
       AppState.newTracksFound = newTracks.length;
       AppState.lastSync = new Date().toLocaleString();
 
-      // 4. Mostrar resultados
       if (newTracks.length > 0) {
-        console.log(`✅ ${newTracks.length} nuevas canciones encontradas:`);
-        newTracks.forEach(track => {
-          console.log(`  🎵 ${track.title} - ${track.artist} (ID: ${track.id})`);
-        });
-
-        // Mostrar modal con nuevas canciones
+        console.log(`✅ ${newTracks.length} nuevas canciones encontradas`);
         this.uiManager.showNewTracksModal(newTracks);
       } else {
-        console.log('ℹ️ No se encontraron nuevas canciones');
-        alert('ℹ️ No hay nuevas canciones en el backend');
+        console.log(`✅ Sincronización completa: ${backendTracks.length} tracks`);
+        alert(`✅ Sincronización exitosa!\n\n${backendTracks.length} canciones en backend\n${newTracks.length} nuevas canciones`);
       }
 
-      // 5. Regenerar QRs
-      await this.generateAllQRs();
-
-      // 6. Actualizar UI
       this.uiManager.updateStatus();
       this.uiManager.updateStats();
 
     } catch (error) {
       console.error('❌ Error en sincronización:', error);
-      alert(`❌ Error al sincronizar: ${error.message}`);
+      alert(`❌ Error al sincronizar:\n\n${error.message}\n\nVerifica que el backend esté corriendo en:\n${AppState.currentBackendUrl}`);
     } finally {
       AppState.isLoading = false;
     }
   }
 
-  // 🎯 GENERAR TODOS LOS QRs
   async generateAllQRs() {
     try {
       AppState.isLoading = true;
-      this.uiManager.showLoading('🎯 Generando QRs...');
+      this.uiManager.showLoading('🎯 Generando 60 QR codes...');
 
       const qrGrid = document.getElementById('qrGrid');
-      const qrHTML = AppState.tracks.map(track => this.createQRCard(track)).join('');
-
+      const qrHTML = AppState.cards.map(card => this.createQRCard(card)).join('');
       qrGrid.innerHTML = qrHTML;
 
-      // Mostrar estadísticas
       document.getElementById('statsPanel').style.display = 'block';
 
-      console.log(`✅ ${AppState.tracks.length} QRs generados exitosamente`);
+      console.log(`✅ ${AppState.cards.length} QR codes generados`);
 
     } catch (error) {
       console.error('❌ Error generando QRs:', error);
@@ -283,64 +250,87 @@ class ScalableQRGenerator {
     }
   }
 
-  // 🎨 CREAR TARJETA DE QR - Mejorada con clean code
-  createQRCard(track) {
-    const qrCode = this.qrService.generateQRCode(track.id);
-    const qrImageUrl = this.qrService.generateQRImageURL(qrCode);
-    const endpoint = this.qrService.generateEndpoint(track.id, AppState.currentBackendUrl);
+  createQRCard(card) {
+    const icon = CARD_ICONS[card.type];
+    const color = CARD_COLORS[card.type];
+    const difficultyDots = this.getDifficultyDots(card.diff);
+    const estimatedPool = this.estimatePoolSize(card);
 
     return `
-      <div class="qr-card" data-track-id="${track.id}">
+      <div class="qr-card" data-card-number="${card.number}">
         <div class="track-header">
-          <div class="track-title">${track.title}</div>
-          <div class="track-artist">${track.artist}</div>
+          <div class="track-title">${icon} Carta #${card.number} - ${card.type}</div>
+          <div class="track-artist">${difficultyDots} ${card.diff}</div>
         </div>
         
         <div class="status-badges">
-          <div class="success-badge">✅ QR-${track.id}</div>
+          <div class="success-badge" style="background: ${color};">✅ ${card.type}</div>
           <div class="mode-badge">${AppState.statusIcon} ${AppState.environmentName}</div>
-          ${track.audioFile ? '<div class="audio-indicator">🎵 Audio OK</div>' : ''}
+          <div class="audio-indicator">🎸 ${card.genre}</div>
+          <div class="audio-indicator">🕰️ ${card.decade}</div>
         </div>
         
         <div class="qr-image">
-          <img src="${qrImageUrl}" 
-               alt="${qrCode}" 
+          <img src="${card.qrImageUrl}" 
+               alt="${card.qrString}" 
                width="250" 
                height="250"
-               loading="lazy"
-               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2Y5ZmFmYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjc3NDhiIj5RUiBFcnJvcjwvdGV4dD48L3N2Zz4='" />
+               loading="lazy" />
         </div>
         
-        <div class="qr-code">${qrCode}</div>
+        <div class="qr-code">${card.qrString}</div>
         
         <div class="track-details">
-          <p><strong>Álbum:</strong> ${track.album || 'N/A'}</p>
-          <p><strong>Año:</strong> ${track.year || 'N/A'}</p>
-          <p><strong>Género:</strong> ${track.genre || 'N/A'}</p>
-          <p><strong>Audio:</strong> ${track.audioFile || 'N/A'}</p>
-          <p><strong>Endpoint:</strong> <span class="endpoint-url">${endpoint}</span></p>
+          <p><strong>Tipo:</strong> ${card.type}</p>
+          <p><strong>Dificultad:</strong> ${card.diff}</p>
+          <p><strong>Género:</strong> ${card.genre}</p>
+          <p><strong>Década:</strong> ${card.decade}</p>
+          <p><strong>Pool estimado:</strong> ~${estimatedPool} canciones</p>
+          <p><strong>Formato:</strong> <span class="format-badge">NUEVO ESCALABLE</span></p>
+          <p><strong>Endpoint:</strong> <span class="endpoint-url">${AppState.currentBackendUrl}/api/qr/scan/${encodeURIComponent(card.qrString)}</span></p>
         </div>
         
         <div class="card-actions">
-          <a href="${qrImageUrl}" 
-             download="HITBACK_${track.id}_QR.png" 
+          <a href="${card.qrImageUrl}" 
+             download="HITBACK_Card_${String(card.number).padStart(2, '0')}.png" 
              class="btn btn-download">
-            💾 Descargar QR
+            💾 Descargar
           </a>
           <button class="btn btn-primary" 
-                  onclick="copyToClipboard('${qrCode}')">
-            📋 Copiar Código
+                  onclick="copyToClipboard('${card.qrString.replace(/'/g, "\\'")}')">
+            📋 Copiar
           </button>
           <button class="btn btn-secondary" 
-                  onclick="testEndpoint('${endpoint}')">
-            🧪 Test Endpoint
+                  onclick="testEndpoint('${AppState.currentBackendUrl}/api/qr/scan/${encodeURIComponent(card.qrString)}')">
+            🧪 Test
           </button>
         </div>
       </div>
     `;
   }
 
-  // 🎨 MANEJAR ERRORES
+  getDifficultyDots(difficulty) {
+    const dots = {
+      EASY: '●',
+      MEDIUM: '●●',
+      HARD: '●●●',
+      EXPERT: '●●●●',
+      ANY: '○'
+    };
+    return dots[difficulty] || '○';
+  }
+
+  estimatePoolSize(card) {
+    const basePool = AppState.tracks.length || 300;
+    let filters = 0;
+    if (card.diff !== 'ANY') filters++;
+    if (card.genre !== 'ANY') filters++;
+    if (card.decade !== 'ANY') filters++;
+    const reductionFactor = 0.3;
+    const estimated = Math.floor(basePool * Math.pow((1 - reductionFactor), filters));
+    return Math.max(estimated, 5);
+  }
+
   handleError(error) {
     const qrGrid = document.getElementById('qrGrid');
     qrGrid.innerHTML = `
@@ -360,52 +350,70 @@ class ScalableQRGenerator {
   }
 }
 
-// 🔧 SERVICIO DE QR CODES - Single Responsibility Principle
+// 🔧 SERVICIO DE QR CODES - SOLO FORMATO NUEVO
 class QRCodeService {
   constructor() {
     this.qrApiBase = 'https://api.qrserver.com/v1/create-qr-code/';
+    this.generatedCards = [];
   }
 
-  // 🎯 Generar código QR consistente - SIEMPRE el mismo para el mismo ID
-  generateQRCode(trackId, difficulty = 'EASY', gameMode = 'SONG') {
-    return `HITBACK_${trackId}_${gameMode}_${difficulty}`;
+  // ✅ GENERAR QR CODE - FORMATO NUEVO ESCALABLE
+  // Formato: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+  generateQRCode(cardConfig) {
+    const { type, diff, genre, decade } = cardConfig;
+    return `HITBACK_TYPE:${type}_DIFF:${diff}_GENRE:${genre}_DECADE:${decade}`;
   }
 
-  // 🖼️ Generar URL de imagen QR
-  generateQRImageURL(qrCode, options = {}) {
+  generateDeck() {
+    this.generatedCards = [];
+    let cardNumber = 1;
+
+    DECK_CONFIG.forEach(config => {
+      for (let i = 0; i < config.count; i++) {
+        const card = {
+          number: cardNumber++,
+          type: config.type,
+          diff: config.diff,
+          genre: config.genre,
+          decade: config.decade,
+          qrString: this.generateQRCode(config)
+        };
+
+        card.qrImageUrl = this.generateQRImageURL(card.qrString);
+        this.generatedCards.push(card);
+      }
+    });
+
+    console.log(`✅ ${this.generatedCards.length} cartas generadas (formato nuevo)`);
+    return this.generatedCards;
+  }
+
+  generateQRImageURL(qrCode) {
     const params = new URLSearchParams({
-      size: options.size || '250x250',
+      size: '300x300',
       data: qrCode,
-      format: options.format || 'png',
-      margin: options.margin || '15',
-      qzone: options.qzone || '1',
-      color: options.color || '0f172a',
-      bgcolor: options.bgcolor || 'ffffff',
-      ...options
+      format: 'png',
+      margin: '20',
+      qzone: '1',
+      color: '0f172a',
+      bgcolor: 'ffffff'
     });
 
     return `${this.qrApiBase}?${params.toString()}`;
   }
-
-  // 🔗 Generar endpoint completo
-  generateEndpoint(trackId, baseUrl, difficulty = 'EASY') {
-    const qrCode = this.generateQRCode(trackId, difficulty);
-    return `${baseUrl}/api/qr/scan/${qrCode}`;
-  }
 }
 
-// 🌐 SERVICIO DE BACKEND - Manejo de API calls
+// 🌐 SERVICIO DE BACKEND
 class BackendService {
   constructor() {
     this.retries = 3;
     this.timeout = 10000;
   }
 
-  // 📡 Obtener tracks del backend
   async fetchTracks() {
-    const url = `${AppState.currentBackendUrl}/api/test/tracks`;
+    const url = `${AppState.currentBackendUrl}/api/tracks`;
 
-    console.log(`📡 Conectando a: ${url}`);
+    console.log(`📡 GET ${url}`);
 
     const response = await this.fetchWithRetry(url, {
       method: 'GET',
@@ -417,11 +425,16 @@ class BackendService {
       cache: 'no-cache'
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const data = await response.json();
+    console.log('📦 Respuesta del backend:', data);
+
     return this.extractTracks(data);
   }
 
-  // 🔄 Fetch con reintentos
   async fetchWithRetry(url, options) {
     let lastError;
 
@@ -429,10 +442,15 @@ class BackendService {
       try {
         console.log(`🔄 Intento ${attempt}/${this.retries}`);
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
         const response = await fetch(url, {
           ...options,
-          signal: AbortSignal.timeout(this.timeout)
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           console.log(`✅ Éxito en intento ${attempt}`);
@@ -454,69 +472,51 @@ class BackendService {
     throw lastError;
   }
 
-  // ⏱️ Delay helper
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // 📊 Extraer tracks de diferentes formatos de respuesta
   extractTracks(data) {
-    if (Array.isArray(data)) return data;
-    if (data.success && Array.isArray(data.data)) return data.data;
-    if (Array.isArray(data.tracks)) return data.tracks;
-    if (data.data && Array.isArray(data.data.tracks)) return data.data.tracks;
+    if (data.success && data.data && Array.isArray(data.data.tracks)) {
+      return data.data.tracks;
+    }
 
+    if (Array.isArray(data.tracks)) {
+      return data.tracks;
+    }
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    console.error('Formato de respuesta inesperado:', data);
     throw new Error('Formato de respuesta inválido del backend');
   }
 }
 
-// 📊 MANAGER DE TRACKS - Data management
-class TrackManager {
-  static validateTrack(track) {
-    return track &&
-      typeof track === 'object' &&
-      track.id &&
-      track.title;
-  }
-
-  static normalizeTrack(track) {
-    return {
-      id: track.id,
-      title: track.title || 'Sin título',
-      artist: track.artist || 'Artista desconocido',
-      album: track.album || 'Álbum desconocido',
-      genre: track.genre || 'Género desconocido',
-      year: track.year || 'Año desconocido',
-      audioFile: track.audioFile || null
-    };
-  }
-}
-
-// 🎨 MANAGER DE UI - User Interface management
+// 🎨 MANAGER DE UI
 class UIManager {
-  // 📊 Actualizar barra de estado
   updateStatus() {
     const statusBar = document.getElementById('statusBar');
     if (statusBar) {
       statusBar.innerHTML = `
         ${AppState.statusIcon} Ambiente: ${AppState.environmentName} | 
         🎯 Modo: ${AppState.currentMode.toUpperCase()} |
-        📱 ${AppState.tracks.length} tracks cargados |
+        🎴 ${AppState.cards.length} cartas |
+        📱 ${AppState.tracks.length} tracks |
         🔄 Última sync: ${AppState.lastSync || 'Nunca'} |
-        ⚡ Estado: ${AppState.isLoading ? 'Cargando...' : 'Listo'}
+        ✅ Formato: NUEVO ESCALABLE
       `;
     }
   }
 
-  // 📈 Actualizar estadísticas
   updateStats() {
     document.getElementById('totalTracks').textContent = AppState.tracks.length;
     document.getElementById('newTracks').textContent = AppState.newTracksFound;
-    document.getElementById('qrGenerated').textContent = AppState.tracks.length;
+    document.getElementById('qrGenerated').textContent = AppState.cards.length;
     document.getElementById('lastSync').textContent = AppState.lastSync || 'Nunca';
   }
 
-  // ⏳ Mostrar estado de carga
   showLoading(message) {
     const qrGrid = document.getElementById('qrGrid');
     qrGrid.innerHTML = `
@@ -527,62 +527,59 @@ class UIManager {
     `;
   }
 
-  // 🎉 Mostrar modal con nuevas canciones
   showNewTracksModal(newTracks) {
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.innerHTML = `
       <div class="modal-content">
-        <h2>🎉 ¡${newTracks.length} Nuevas Canciones Encontradas!</h2>
+        <h2>🎉 ¡${newTracks.length} Nuevas Canciones!</h2>
         <div class="new-tracks-list">
-          ${newTracks.map(track => `
+          ${newTracks.slice(0, 10).map(track => `
             <div class="new-track-item">
               <strong>${track.title}</strong> - ${track.artist}
               <span class="track-id">ID: ${track.id}</span>
             </div>
           `).join('')}
+          ${newTracks.length > 10 ? `<p>... y ${newTracks.length - 10} más</p>` : ''}
         </div>
         <div class="modal-actions">
           <button onclick="this.closest('.modal-overlay').remove()" class="btn btn-primary">
-            ✅ ¡Genial, crear QRs!
+            ✅ Entendido
           </button>
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
-
-    // Auto-cerrar después de 5 segundos
-    setTimeout(() => modal.remove(), 5000);
   }
 }
 
-// 🌍 FUNCIONES GLOBALES - Interface con HTML
+// 🌍 FUNCIONES GLOBALES
 
-// 🔄 Cambiar modo de operación
 function setMode(mode) {
   AppState.currentMode = mode;
 
-  // Actualizar botones activos
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.classList.remove('active');
   });
   document.getElementById(`${mode}Btn`).classList.add('active');
 
   console.log(`🔄 Modo cambiado a: ${mode}`);
-  app.loadTracks().then(() => app.generateAllQRs());
+  app.loadTracks().then(() => {
+    app.uiManager.updateStatus();
+    app.uiManager.updateStats();
+  });
 }
 
-// 🌍 Cambiar ambiente
 function changeEnvironment() {
   const select = document.getElementById('environmentSelect');
   AppState.currentEnvironment = select.value;
 
   console.log(`🌍 Ambiente cambiado a: ${AppState.environmentName}`);
+  console.log(`📍 URL: ${AppState.currentBackendUrl}`);
   app.uiManager.updateStatus();
 }
 
-// 🔄 Funciones de sincronización
 function syncFromBackend() {
   app.syncFromBackend();
 }
@@ -591,50 +588,61 @@ function generateAllQRs() {
   app.generateAllQRs();
 }
 
-// 📦 Descargar todos los QRs
 function downloadAllQRs() {
-  // Implementar descarga masiva de QRs
-  alert('🚧 Función de descarga masiva en desarrollo');
+  if (!confirm('📦 Esto descargará las 60 cartas.\n\n¿Continuar?')) {
+    return;
+  }
+
+  AppState.cards.forEach((card, index) => {
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.href = card.qrImageUrl;
+      link.download = `HITBACK_Card_${String(card.number).padStart(2, '0')}.png`;
+      link.click();
+    }, index * 300);
+  });
 }
 
-// 📋 Copiar al portapapeles
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
-    alert(`✅ Copiado: ${text}`);
+    alert(`✅ Copiado:\n${text}`);
   }).catch(() => {
-    // Fallback para navegadores sin clipboard API
     const textarea = document.createElement('textarea');
     textarea.value = text;
     document.body.appendChild(textarea);
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-    alert(`✅ Copiado: ${text}`);
+    alert(`✅ Copiado:\n${text}`);
   });
 }
 
-// 🧪 Probar endpoint
 async function testEndpoint(endpoint) {
   try {
-    const response = await fetch(endpoint);
+    console.log(`🧪 Testing: ${endpoint}`);
+
+    const response = await fetch(endpoint, { method: 'POST' });
     const data = await response.json();
-    alert(`✅ Endpoint OK!\n${JSON.stringify(data, null, 2)}`);
+
+    if (data.success) {
+      alert(`✅ Endpoint funcionando!\n\nTrack: ${data.data.track.title}\nArtista: ${data.data.track.artist}\nTipo: ${data.data.question.type}\nPregunta: ${data.data.question.question}\n\nPool aplicado:\n  Género: ${data.data.scan.filters.genre || 'ANY'}\n  Década: ${data.data.scan.filters.decade || 'ANY'}`);
+    } else {
+      alert(`⚠️ Respuesta:\n${JSON.stringify(data, null, 2)}`);
+    }
   } catch (error) {
-    alert(`❌ Error en endpoint:\n${error.message}`);
+    alert(`❌ Error en endpoint:\n${error.message}\n\nVerifica que el backend esté corriendo.`);
   }
 }
 
-// 🚀 INICIALIZACIÓN PRINCIPAL
+// 🚀 INICIALIZACIÓN
 let app;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🎵 HITBACK QR Generator - Versión Escalable');
-  console.log('🏗️ Inicializando aplicación...');
+  console.log('🎵 HITBACK QR Generator - Formato Nuevo Escalable');
+  console.log('✅ Solo acepta: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s');
+  console.log('🏗️ Inicializando...');
 
-  // Crear instancia principal
   app = new ScalableQRGenerator();
-
-  // Inicializar aplicación
   await app.initialize();
 
   console.log('🎉 ¡Aplicación lista!');
